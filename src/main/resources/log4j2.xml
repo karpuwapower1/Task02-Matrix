@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="debug" strict="true" name="XMLConfigTest"
+               packages="org.apache.logging.log4j.test">
+  <Properties>
+    <Property name="filename">target/log.log</Property>
+  </Properties>
+ 
+  <Appenders>
+    <File name="File" fileName="${filename}">
+       <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5p [%t] %c{2} %m%n"/>
+</File>
+    </Appenders>
+<Loggers>
+    <Logger name="by.training.karpilovich" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+ 
+    <Root level="trace">
+      <AppenderRef ref="File"/>
+    </Root>
+ </Loggers>
+</Configuration>
