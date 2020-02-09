@@ -22,7 +22,7 @@ public class Service implements Callable<Integer> {
 	private int value;
 
 	private static final Logger LOGGER = LogManager.getLogger(Service.class);
-	
+
 	public Service(CyclicBarrier barrier, int value) {
 		this.barrier = barrier;
 		this.value = value;
@@ -42,7 +42,7 @@ public class Service implements Callable<Integer> {
 		LOGGER.debug("barrier is cancelled");
 		releaseElementLock(matrix.getElement(diagonalIndex, diagonalIndex));
 		LOGGER.debug("diag is released");
-		releaseElementLock(isRow ? matrix.getElement(diagonalIndex, index) :  matrix.getElement(index, diagonalIndex));		
+		releaseElementLock(isRow ? matrix.getElement(diagonalIndex, index) : matrix.getElement(index, diagonalIndex));
 		LOGGER.debug("el is released");
 		int sum = countRowSum();
 		sum += countColumnSum();
@@ -68,22 +68,21 @@ public class Service implements Callable<Integer> {
 				continue;
 			}
 			isRow = random.nextBoolean();
-			
+
 			change = (isRow) ? isChanged(diagonalIndex, index) : isChanged(index, diagonalIndex);
-			LOGGER.debug(
-					"change = " + change + " isRow= " + isRow + 
-					(isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
+			LOGGER.debug("change = " + change + " isRow= " + isRow
+					+ (isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
 		}
 	}
 
 	private boolean isChanged(int i, int j) {
 		return (matrix.getElement(i, j).changeElement(value));
 	}
-	
+
 	private void releaseElementLock(Element element) {
 		element.unlock();
 	}
-	
+
 	private int countRowSum() {
 		int sum = 0;
 		for (int i = 0; i < matrix.length(); i++) {
@@ -91,7 +90,7 @@ public class Service implements Callable<Integer> {
 		}
 		return sum;
 	}
-	
+
 	private int countColumnSum() {
 		int sum = 0;
 		for (int i = 0; i < matrix.length(); i++) {
