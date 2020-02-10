@@ -8,22 +8,23 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import by.training.karpilovich.task02.dao.MatrixDAO;
+import by.training.karpilovich.task02.dao.util.Formatter;
 import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
 import by.training.karpilovich.task02.exception.DAOException;
 import by.training.karpilovich.task02.exception.FormatException;
 import by.training.karpilovich.task02.exception.ServiceException;
-import by.training.karpilovich.task02.factory.ReaderFactory;
+import by.training.karpilovich.task02.factory.DAOFactory;
 import by.training.karpilovich.task02.validator.Validator;
 
 public class Initializator {
 
 	private final static Logger LOGGER = LogManager.getLogger(Initializator.class);
 
-	private ElementFormat format = new ElementFormat();
+	private Formatter format = new Formatter();
 	private static final String MATRIX_FILE = "matrix.txt";
-	private static final String THREAD_NAME_FILE = "threadname.txt";
-	MatrixDAO reader = ReaderFactory.getInstance().getReader();
+	private static final String THREAD_NAME_FILE = "threads.txt";
+	MatrixDAO reader = DAOFactory.getInstance().getMatrixDAO();
 	private Validator validator = new Validator();
 
 	public void initMatrix() throws ServiceException {
@@ -41,11 +42,12 @@ public class Initializator {
 		Matrix.getInstance().setMatrix(elements);
 	}
 
-	public int[][] initTnreadNames() throws ServiceException {
+	public int[][] initThreadNames() throws ServiceException {
 		int[][] names = readIntsFromFile(THREAD_NAME_FILE);
 		int capacity = 0;
 		for (int [] row : names) {
 			capacity += row.length;
+			LOGGER.debug("capacity= " + capacity);
 		}
 		if (!validator.isThreadQuantityLegal(capacity, Matrix.getInstance().length()) 
 				|| !validator.isThreadNamesUnique(names, capacity)) {
@@ -70,7 +72,7 @@ public class Initializator {
 			}
 			return elements;
 		} catch (FormatException e) {
-			LOGGER.error("Illegel String: " + str);
+			LOGGER.error("Illegel String: " + str + " file =" + fileName);
 			throw new ServiceException(e);
 		} catch (DAOException e) {
 			LOGGER.warn(e);
@@ -81,11 +83,10 @@ public class Initializator {
 	private void initReader(String fileName) throws ServiceException {
 		File file = initFile(fileName);
 		reader.setResource(file);
-
 	}
 
 	private File initFile(String fileName) throws ServiceException {
-		URL url = getClass().getClassLoader().getResource("matrix.txt");
+		URL url = getClass().getClassLoader().getResource(fileName);
 		if (url == null) {
 			LOGGER.error("File matrix.txt not found");
 			throw new ServiceException();

@@ -9,9 +9,7 @@ public interface MatrixDAO {
 	
 	public List<String> read() throws DAOException;
 	
-	public void writeMatrix() throws DAOException;
-	
-	public void writeSum();
+	public void write(String str) throws DAOException;
 	
 	public void setResource(File file);
 

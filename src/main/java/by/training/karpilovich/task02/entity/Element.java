@@ -6,10 +6,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import by.training.karpilovich.task02.service.Service;
-
 public class Element {
-	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+	private static final Logger LOGGER = LogManager.getLogger(Element.class);
 	
 	private int value;
 	private Lock lock = new ReentrantLock();
@@ -26,8 +24,9 @@ public class Element {
 		this.value = value;
 	}
 	
-	public boolean changeElement(int value) {
+	public boolean changeElement() {
 		if (lock.tryLock()) {
+			int value = Integer.parseInt(Thread.currentThread().getName());
 			this.value = value;
 			LOGGER.debug("element new value = " + value);
 			return true;

@@ -1,4 +1,9 @@
-package by.training.karpilovich.task02.service;
+package by.training.karpilovich.task02.dao.util;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,9 +12,9 @@ import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
 import by.training.karpilovich.task02.exception.FormatException;
 
-public class ElementFormat {
+public class Formatter {
 
-	private static final Logger LOGGER = LogManager.getLogger(ElementFormat.class);
+	private static final Logger LOGGER = LogManager.getLogger(Formatter.class);
 
 	private static final String DELIMETER = " ";
 
@@ -27,7 +32,7 @@ public class ElementFormat {
 		return ints;
 	}
 
-	public String format() {
+	public String formatMatrix() {
 		Element[][] elements = Matrix.getInstance().getMatrix();
 		StringBuilder builder = new StringBuilder();
 		for (Element[] rowElements : elements) {
@@ -35,6 +40,19 @@ public class ElementFormat {
 				builder.append(element.getValue() + DELIMETER);
 			}
 			builder.append('\n');
+		}
+		return builder.toString();
+	}
+
+	public String formatStringSum(Map<Integer, Future<Integer>> map) throws FormatException {
+		StringBuilder builder = new StringBuilder('\n');
+		try {
+			for (Entry<Integer, Future<Integer>> entry : map.entrySet()) {
+				builder.append(String.format("%d = %d%n", entry.getKey(), entry.getValue().get()));
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			LOGGER.error(e.getClass().getSimpleName());
+			throw new FormatException(e);
 		}
 		return builder.toString();
 	}

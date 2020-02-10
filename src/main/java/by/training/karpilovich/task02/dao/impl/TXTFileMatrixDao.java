@@ -14,19 +14,17 @@ import org.apache.logging.log4j.Logger;
 
 import by.training.karpilovich.task02.dao.MatrixDAO;
 import by.training.karpilovich.task02.exception.DAOException;
-import by.training.karpilovich.task02.service.ElementFormat;
 
 public class TXTFileMatrixDao implements MatrixDAO {
 
 	private File file;
-	private ElementFormat format = new ElementFormat();
-
+	
 	@Override
 	public void setResource(File file) {
 		this.file = file;
 	}
 
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger LOGGER = LogManager.getLogger(TXTFileMatrixDao.class);
 
 	public List<String> read() throws DAOException {
 		List<String> list = new ArrayList<>();
@@ -45,21 +43,14 @@ public class TXTFileMatrixDao implements MatrixDAO {
 	}
 
 	@Override
-	public void writeMatrix() throws DAOException {
-		String writingString = format.format();
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-			writer.write(writingString);
+	public void write(String str) throws DAOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+			LOGGER.debug(str);
+			writer.write(str);
+			writer.flush();
 		} catch (IOException e) {
-			LOGGER.error(e);
-			throw new DAOException(e);
+			LOGGER.error("IOException " + e.getClass().getSimpleName() + " while writing into a file " + file.getName());
+		throw new DAOException(e);
 		}
-
 	}
-
-	@Override
-	public void writeSum() {
-		// TODO Auto-generated method stub
-
-	}
-
 }
