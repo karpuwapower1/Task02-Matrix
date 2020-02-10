@@ -19,7 +19,6 @@ public class Matrix {
 	public void setMatrix(Element[][] matrix) {
 		this.matrix = matrix;
 		this.barrier = new CyclicBarrier(matrix.length);
-		
 	}
 
 	public Element[][] getMatrix() {

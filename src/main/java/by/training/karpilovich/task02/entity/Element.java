@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Element {
 	private static final Logger LOGGER = LogManager.getLogger(Element.class);
-	
+
 	private int value;
 	private Lock lock = new ReentrantLock();
 
@@ -23,7 +23,7 @@ public class Element {
 	public void setValue(int value) {
 		this.value = value;
 	}
-	
+
 	public boolean changeElement() {
 		if (lock.tryLock()) {
 			int value = Integer.parseInt(Thread.currentThread().getName());
@@ -33,7 +33,7 @@ public class Element {
 		}
 		return false;
 	}
-	
+
 	public void unlock() {
 		lock.unlock();
 	}
@@ -53,4 +53,8 @@ public class Element {
 		return value == other.value;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + " [value=" + value + ", lock=" + lock + "]";
+	}
 }

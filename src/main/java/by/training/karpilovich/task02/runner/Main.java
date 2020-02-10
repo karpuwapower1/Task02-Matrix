@@ -14,9 +14,7 @@ public class Main {
 		try {
 			service.changeMatrix();
 		} catch (ServiceException e) {
-			LOGGER.error("ERROR");
+			LOGGER.error("ERROR\n" + e.getStackTrace());
 		}
-
 	}
-
 }

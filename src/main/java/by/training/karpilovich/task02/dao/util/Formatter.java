@@ -17,6 +17,8 @@ public class Formatter {
 	private static final Logger LOGGER = LogManager.getLogger(Formatter.class);
 
 	private static final String DELIMETER = " ";
+	private static final char NEW_LINE = '\n';
+	private static final String SUM_PATTERN = "Sum of thread's N %d column and row = %d%n";
 
 	public int[] parse(String str) throws FormatException {
 		String[] parameters = str.split(DELIMETER);
@@ -39,16 +41,16 @@ public class Formatter {
 			for (Element element : rowElements) {
 				builder.append(element.getValue() + DELIMETER);
 			}
-			builder.append('\n');
+			builder.append(NEW_LINE);
 		}
 		return builder.toString();
 	}
 
 	public String formatStringSum(Map<Integer, Future<Integer>> map) throws FormatException {
-		StringBuilder builder = new StringBuilder('\n');
+		StringBuilder builder = new StringBuilder();
 		try {
 			for (Entry<Integer, Future<Integer>> entry : map.entrySet()) {
-				builder.append(String.format("%d = %d%n", entry.getKey(), entry.getValue().get()));
+				builder.append(String.format(SUM_PATTERN, entry.getKey(), entry.getValue().get()));
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			LOGGER.error(e.getClass().getSimpleName());

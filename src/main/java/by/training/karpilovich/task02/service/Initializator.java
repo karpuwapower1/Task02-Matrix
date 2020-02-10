@@ -31,7 +31,7 @@ public class Initializator {
 		int[][] values = readIntsFromFile(MATRIX_FILE);
 		if (!validator.isMatrixSquare(values)) {
 			LOGGER.error("Matrix isn't squatre matrix ");
-			throw new ServiceException("Matrix isn't squatre matrix ");
+			throw new ServiceException();
 		}
 		Element[][] elements = new Element[values.length][values.length];
 		for (int i = 0; i < values.length; i++) {
@@ -52,7 +52,7 @@ public class Initializator {
 		if (!validator.isThreadQuantityLegal(capacity, Matrix.getInstance().length()) 
 				|| !validator.isThreadNamesUnique(names, capacity)) {
 			LOGGER.error("Thread names are illegal ");
-			throw new ServiceException("Thread names are illegal ");
+			throw new ServiceException();
 		}
 		return names;
 
@@ -88,7 +88,7 @@ public class Initializator {
 	private File initFile(String fileName) throws ServiceException {
 		URL url = getClass().getClassLoader().getResource(fileName);
 		if (url == null) {
-			LOGGER.error("File matrix.txt not found");
+			LOGGER.error("File " + fileName + " not found");
 			throw new ServiceException();
 		}
 		return new File(url.getFile());

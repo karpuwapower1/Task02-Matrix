@@ -18,7 +18,7 @@ import by.training.karpilovich.task02.exception.DAOException;
 public class TXTFileMatrixDao implements MatrixDAO {
 
 	private File file;
-	
+
 	@Override
 	public void setResource(File file) {
 		this.file = file;
@@ -49,8 +49,9 @@ public class TXTFileMatrixDao implements MatrixDAO {
 			writer.write(str);
 			writer.flush();
 		} catch (IOException e) {
-			LOGGER.error("IOException " + e.getClass().getSimpleName() + " while writing into a file " + file.getName());
-		throw new DAOException(e);
+			LOGGER.error(
+					"IOException " + e.getClass().getSimpleName() + " while writing into a file " + file.getName());
+			throw new DAOException(e);
 		}
 	}
 }

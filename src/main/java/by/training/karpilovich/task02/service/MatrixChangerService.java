@@ -1,5 +1,7 @@
 package by.training.karpilovich.task02.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
@@ -12,15 +14,14 @@ import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
 import by.training.karpilovich.task02.exception.ServiceException;
 
-public class MatrixChangerService implements Callable<Integer>{
-	
+public class MatrixChangerService implements Callable<Integer> {
+
 	private Matrix matrix = Matrix.getInstance();
 	private Random random = new Random();
+	List<Element> locked = new ArrayList<>();
 	private CyclicBarrier barrier;
-	private int diagonalIndex;
-	private boolean isRow;
-	private int index;
 	private int name;
+	private int diagonalIndex;
 
 	private static final Logger LOGGER = LogManager.getLogger(MatrixChangerService.class);
 
@@ -42,10 +43,8 @@ public class MatrixChangerService implements Callable<Integer>{
 			throw new ServiceException(e);
 		}
 		LOGGER.debug("barrier is cancelled");
-		releaseElementLock(matrix.getElement(diagonalIndex, diagonalIndex));
-		LOGGER.debug("diag is released");
-		releaseElementLock(isRow ? matrix.getElement(diagonalIndex, index) : matrix.getElement(index, diagonalIndex));
-		LOGGER.debug("el is released");
+		releaseElementLock();
+		LOGGER.debug("elements is released");
 		int sum = countSum();
 		return Integer.valueOf(sum);
 	}
@@ -62,6 +61,8 @@ public class MatrixChangerService implements Callable<Integer>{
 
 	private void changeNonDiagonalElement() {
 		boolean change = false;
+		int index;
+		boolean isRow;
 		while (!change) {
 			index = random.nextInt(matrix.length());
 			if (index == diagonalIndex) {
@@ -69,25 +70,31 @@ public class MatrixChangerService implements Callable<Integer>{
 			}
 			isRow = random.nextBoolean();
 			change = (isRow) ? isChanged(diagonalIndex, index) : isChanged(index, diagonalIndex);
-			
+
 			LOGGER.debug("change = " + change + " isRow= " + isRow
 					+ (isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
 		}
 	}
 
 	private boolean isChanged(int i, int j) {
-		return (matrix.getElement(i, j).changeElement());
+		Element element = matrix.getElement(i, j);
+		if (element.changeElement()) {
+			locked.add(element);
+			return true;
+		}
+		return false;
 	}
 
-	private void releaseElementLock(Element element) {
-		element.unlock();
+	private void releaseElementLock() {
+		for (Element element : locked) {
+			element.unlock();
+		}
 	}
-	
+
 	private int countSum() {
 		int sum = countRowSum();
 		sum += countColumnSum();
-		sum -= matrix.getElement(diagonalIndex, diagonalIndex).getValue();
-		return sum;
+		return sum - matrix.getElement(diagonalIndex, diagonalIndex).getValue();
 	}
 
 	private int countRowSum() {
