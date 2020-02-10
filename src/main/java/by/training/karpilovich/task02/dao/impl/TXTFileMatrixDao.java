@@ -12,19 +12,20 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import by.training.karpilovich.task02.dao.DAO;
+import by.training.karpilovich.task02.dao.MatrixDAO;
 import by.training.karpilovich.task02.exception.DAOException;
 import by.training.karpilovich.task02.service.ElementFormat;
 
-public class TXTFileDao implements DAO {
+public class TXTFileMatrixDao implements MatrixDAO {
 
 	private File file;
 	private ElementFormat format = new ElementFormat();
-	
-	public void setFile(File file) {
+
+	@Override
+	public void setResource(File file) {
 		this.file = file;
 	}
-	
+
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	public List<String> read() throws DAOException {
@@ -32,7 +33,9 @@ public class TXTFileDao implements DAO {
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				list.add(line);
+				if (!line.isEmpty()) {
+					list.add(line);
+				}
 			}
 		} catch (IOException e) {
 			LOGGER.warn(e);
@@ -50,13 +53,13 @@ public class TXTFileDao implements DAO {
 			LOGGER.error(e);
 			throw new DAOException(e);
 		}
-		
+
 	}
 
 	@Override
 	public void writeSum() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

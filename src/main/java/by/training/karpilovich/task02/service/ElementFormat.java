@@ -5,28 +5,28 @@ import org.apache.logging.log4j.Logger;
 
 import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
-import by.training.karpilovich.task02.exception.DAOException;
+import by.training.karpilovich.task02.exception.FormatException;
 
 public class ElementFormat {
-	
+
 	private static final Logger LOGGER = LogManager.getLogger(ElementFormat.class);
-	
+
 	private static final String DELIMETER = " ";
-	
-	public Element[] parse(String str) throws DAOException {
+
+	public int[] parse(String str) throws FormatException {
 		String[] parameters = str.split(DELIMETER);
-		Element[] elements = new Element[parameters.length];
+		int[] ints = new int[parameters.length];
 		for (int i = 0; i < parameters.length; i++) {
 			try {
-			elements[i] = new Element(Integer.parseInt(parameters[i]));
+				ints[i] = Integer.parseInt(parameters[i]);
 			} catch (NumberFormatException e) {
-				LOGGER.error(str + " " + e);
-				throw new DAOException(e);
+				LOGGER.error("Illegal string " + str);
+				throw new FormatException(e);
 			}
 		}
-		return elements;
+		return ints;
 	}
-	
+
 	public String format() {
 		Element[][] elements = Matrix.getInstance().getMatrix();
 		StringBuilder builder = new StringBuilder();
