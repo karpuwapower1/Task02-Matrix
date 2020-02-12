@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Element {
+public final class Element {
 	private static final Logger LOGGER = LogManager.getLogger(Element.class);
 
 	private int value;
@@ -55,6 +55,6 @@ public class Element {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " [value=" + value + ", lock=" + lock + "]";
+		return getClass().getSimpleName() + " [value=" + value + "]";
 	}
 }
