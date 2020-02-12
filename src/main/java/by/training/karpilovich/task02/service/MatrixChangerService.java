@@ -17,11 +17,10 @@ import by.training.karpilovich.task02.exception.ServiceException;
 public class MatrixChangerService implements Callable<Integer> {
 
 	private Matrix matrix = Matrix.getInstance();
-	private Random random = new Random();
 	List<Element> locked = new ArrayList<>();
 	private CyclicBarrier barrier;
 	private int name;
-	private int diagonalIndex;
+	private int diagonalIndex = 0;
 
 	private static final Logger LOGGER = LogManager.getLogger(MatrixChangerService.class);
 
@@ -50,26 +49,25 @@ public class MatrixChangerService implements Callable<Integer> {
 	}
 
 	private void changeDiagonalElement() {
-		int index = 0;
-		while (!(isChanged(index, index))) {
-			index = (index == matrix.length() - 1) ? 0 : index + 1;
-			LOGGER.debug("index " + index);
+		while (!(isChanged(diagonalIndex, diagonalIndex))) {
+			diagonalIndex = (diagonalIndex == matrix.length() - 1) ? 0 : diagonalIndex + 1;
+			LOGGER.debug("index " + diagonalIndex);
 		}
-		diagonalIndex = index;
-		LOGGER.debug("set diagonal index " + index);
+		LOGGER.debug("set diagonal index " + diagonalIndex);
 	}
 
 	private void changeNonDiagonalElement() {
+		Random random = new Random();
 		boolean change = false;
 		int index;
 		boolean isRow;
 		while (!change) {
-			index = random.nextInt(matrix.length());
-			if (index == diagonalIndex) {
+			if ((index = random.nextInt(matrix.length())) == diagonalIndex) {
 				continue;
 			}
-			isRow = random.nextBoolean();
-			change = (isRow) ? isChanged(diagonalIndex, index) : isChanged(index, diagonalIndex);
+			change = (isRow = random.nextBoolean()) 
+					? isChanged(diagonalIndex, index) 
+							: isChanged(index, diagonalIndex);
 
 			LOGGER.debug("change = " + change + " isRow= " + isRow
 					+ (isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
