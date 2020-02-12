@@ -12,15 +12,14 @@ import org.apache.logging.log4j.Logger;
 
 import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
-import by.training.karpilovich.task02.exception.ServiceException;
 
 public class MatrixChangerService implements Callable<Integer> {
 
 	private Matrix matrix = Matrix.getInstance();
 	List<Element> locked = new ArrayList<>();
+	private int diagonalIndex = 0;
 	private CyclicBarrier barrier;
 	private int name;
-	private int diagonalIndex = 0;
 
 	private static final Logger LOGGER = LogManager.getLogger(MatrixChangerService.class);
 
@@ -30,27 +29,28 @@ public class MatrixChangerService implements Callable<Integer> {
 	}
 
 	@Override
-	public Integer call() throws ServiceException {
-		Thread.currentThread().setName(String.valueOf(name));
-		changeDiagonalElement();
-		changeNonDiagonalElement();
+	public Integer call() {
+		int sum = 0;
 		try {
-			barrier.await();
+			Thread.currentThread().setName(String.valueOf(name));
+			changeDiagonalElement();
+			changeNonDiagonalElement();
 			LOGGER.debug("await barrier");
+			barrier.await();
+			LOGGER.debug("barrier is cancelled");
+			releaseElementLock();
+			LOGGER.debug("elements is released");
+			sum = countSum();
 		} catch (BrokenBarrierException | InterruptedException e) {
+			releaseElementLock();
 			LOGGER.error(e.getClass().getSimpleName());
-			throw new ServiceException(e);
 		}
-		LOGGER.debug("barrier is cancelled");
-		releaseElementLock();
-		LOGGER.debug("elements is released");
-		int sum = countSum();
 		return Integer.valueOf(sum);
 	}
 
 	private void changeDiagonalElement() {
 		while (!(isChanged(diagonalIndex, diagonalIndex))) {
-			diagonalIndex = (diagonalIndex == matrix.length() - 1) ? 0 : diagonalIndex + 1;
+			diagonalIndex = (diagonalIndex == matrix.getLength() - 1) ? 0 : diagonalIndex + 1;
 			LOGGER.debug("index " + diagonalIndex);
 		}
 		LOGGER.debug("set diagonal index " + diagonalIndex);
@@ -62,23 +62,20 @@ public class MatrixChangerService implements Callable<Integer> {
 		int index;
 		boolean isRow;
 		while (!change) {
-			if ((index = random.nextInt(matrix.length())) == diagonalIndex) {
-				continue;
-			}
-			change = (isRow = random.nextBoolean()) 
-					? isChanged(diagonalIndex, index) 
-							: isChanged(index, diagonalIndex);
+			if ((index = random.nextInt(matrix.getLength())) != diagonalIndex) {
+				change = (isRow = random.nextBoolean()) ? isChanged(diagonalIndex, index)
+						: isChanged(index, diagonalIndex);
 
-			LOGGER.debug("change = " + change + " isRow= " + isRow
-					+ (isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
+				LOGGER.debug("change = " + change + " isRow= " + isRow
+						+ (isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
+			}
 		}
 	}
 
 	private boolean isChanged(int i, int j) {
 		Element element = matrix.getElement(i, j);
 		if (element.changeElement()) {
-			locked.add(element);
-			return true;
+			return locked.add(element);
 		}
 		return false;
 	}
@@ -97,7 +94,7 @@ public class MatrixChangerService implements Callable<Integer> {
 
 	private int countRowSum() {
 		int sum = 0;
-		for (int i = 0; i < matrix.length(); i++) {
+		for (int i = 0; i < matrix.getLength(); i++) {
 			sum += matrix.getElement(diagonalIndex, i).getValue();
 		}
 		return sum;
@@ -105,7 +102,7 @@ public class MatrixChangerService implements Callable<Integer> {
 
 	private int countColumnSum() {
 		int sum = 0;
-		for (int i = 0; i < matrix.length(); i++) {
+		for (int i = 0; i < matrix.getLength(); i++) {
 			sum += matrix.getElement(i, diagonalIndex).getValue();
 		}
 		return sum;

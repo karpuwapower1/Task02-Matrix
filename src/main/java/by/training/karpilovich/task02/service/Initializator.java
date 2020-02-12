@@ -49,7 +49,7 @@ public class Initializator {
 			capacity += row.length;
 			LOGGER.debug("capacity= " + capacity);
 		}
-		if (!validator.isThreadQuantityLegal(capacity, Matrix.getInstance().length()) 
+		if (!validator.isThreadQuantityLegal(capacity, Matrix.getInstance().getLength()) 
 				|| !validator.isThreadNamesUnique(names, capacity)) {
 			LOGGER.error("Thread names are illegal ");
 			throw new ServiceException();
@@ -67,7 +67,7 @@ public class Initializator {
 			int[][] elements = new int[list.size()][];
 			for (int i = 0; i < list.size(); i++) {
 				str = list.get(i);
-				row = format.parse(str);
+				row = format.parseStringToIntArray(str);
 				elements[i] = row;
 			}
 			return elements;

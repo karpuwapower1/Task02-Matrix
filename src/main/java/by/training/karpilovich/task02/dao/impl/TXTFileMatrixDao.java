@@ -19,12 +19,12 @@ public class TXTFileMatrixDao implements MatrixDAO {
 
 	private File file;
 
+	private static final Logger LOGGER = LogManager.getLogger(TXTFileMatrixDao.class);
+
 	@Override
 	public void setResource(File file) {
 		this.file = file;
 	}
-
-	private static final Logger LOGGER = LogManager.getLogger(TXTFileMatrixDao.class);
 
 	public List<String> read() throws DAOException {
 		List<String> list = new ArrayList<>();

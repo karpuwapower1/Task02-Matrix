@@ -20,7 +20,7 @@ public class Formatter {
 	private static final char NEW_LINE = '\n';
 	private static final String SUM_PATTERN = "Sum of thread's N %d column and row = %s%n";
 
-	public int[] parse(String str) throws FormatException {
+	public int[] parseStringToIntArray(String str) throws FormatException {
 		String[] parameters = str.split(DELIMETER);
 		int[] ints = new int[parameters.length];
 		for (int i = 0; i < parameters.length; i++) {

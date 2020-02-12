@@ -1,12 +1,10 @@
 package by.training.karpilovich.task02.entity;
 
 import java.util.Arrays;
-import java.util.concurrent.CyclicBarrier;
 
 public class Matrix {
 
 	private Element[][] matrix;
-	private CyclicBarrier barrier;
 	
 	private static class InstanceHolder {
 		private static final Matrix instance = new Matrix();
@@ -18,7 +16,6 @@ public class Matrix {
 
 	public void setMatrix(Element[][] matrix) {
 		this.matrix = matrix;
-		this.barrier = new CyclicBarrier(matrix.length);
 	}
 
 	public Element[][] getMatrix() {
@@ -29,11 +26,7 @@ public class Matrix {
 		return matrix[i][j];
 	}
 	
-	public CyclicBarrier getBarrier() {
-		return barrier;
-	}
-	
-	public int length() {
+	public int getLength() {
 		return matrix.length;
 	}
 	

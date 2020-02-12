@@ -23,44 +23,43 @@ import by.training.karpilovich.task02.factory.DAOFactory;
 
 public class MatrixService {
 	private static final Logger LOGGER = LogManager.getLogger(MatrixService.class);
-	private Initializator init = new Initializator();
-	private Map<Integer, Future<Integer>> map;
+	Initializator initializator = new Initializator();
+	private Map<Integer, Future<Integer>> map = new HashMap<>();
 	private MatrixDAO writer = DAOFactory.getInstance().getMatrixDAO();
 	private static final String MATRIX_FILE = "change.txt";
 	private Formatter formatter = new Formatter();
 
-	public void changeMatrix() throws ServiceException {
-		init.initMatrix();
-		int[][] threadNames = init.initThreadNames();
+	public void changeMatrix(int[][] threadNames) throws ServiceException {
+		initWriter(MATRIX_FILE);
 		for (int[] name : threadNames) {
 			changeMatrix(name);
 			writeMatrix();
 			writeSum();
+			map.clear();
 		}
 	}
 
-	private Map<Integer, Future<Integer>> changeMatrix(int[] name) {
-		int threadQuantity = Matrix.getInstance().length();
-		map = new HashMap<>();
-		CyclicBarrier barrier = Matrix.getInstance().getBarrier();
+	private Map<Integer, Future<Integer>> changeMatrix(int[] name) throws ServiceException {
+		int threadQuantity = Matrix.getInstance().getLength();
+		CyclicBarrier barrier = new CyclicBarrier(Matrix.getInstance().getLength());
 		Future<Integer> future;
 		ExecutorService executor = Executors.newFixedThreadPool(threadQuantity);
-		for (int i = 0; i < Matrix.getInstance().length(); i++) {
+		for (int i = 0; i < Matrix.getInstance().getLength(); i++) {
 			future = executor.submit(new MatrixChangerService(barrier, name[i]));
 			map.put(name[i], future);
 		}
 		executor.shutdown();
 
 		try {
-			executor.awaitTermination(1, TimeUnit.DAYS);
+			executor.awaitTermination(1, TimeUnit.HOURS);
+			return map;
 		} catch (InterruptedException e) {
 			LOGGER.error("InterruptedException " + e);
+			throw new ServiceException();
 		}
-		return map;
 	}
 
 	private void writeMatrix() throws ServiceException {
-		initWriter(MATRIX_FILE);
 		try {
 			writer.write(formatter.formatMatrix());
 		} catch (DAOException e) {
@@ -70,7 +69,6 @@ public class MatrixService {
 	}
 
 	private void writeSum() throws ServiceException {
-		initWriter(MATRIX_FILE);
 		try {
 			writer.write(formatter.formatStringSum(map));
 		} catch (FormatException | DAOException e) {
@@ -81,7 +79,7 @@ public class MatrixService {
 	private void initWriter(String fileName) throws ServiceException {
 		File file = initFile(fileName);
 		writer.setResource(file);
-		
+
 		LOGGER.debug(file.getName());
 	}
 
