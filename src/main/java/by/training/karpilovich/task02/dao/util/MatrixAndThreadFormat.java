@@ -12,9 +12,9 @@ import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
 import by.training.karpilovich.task02.exception.FormatException;
 
-public class Formatter {
+public class MatrixAndThreadFormat {
 
-	private static final Logger LOGGER = LogManager.getLogger(Formatter.class);
+	private static final Logger LOGGER = LogManager.getLogger(MatrixAndThreadFormat.class);
 
 	private static final String DELIMETER = " ";
 	private static final char NEW_LINE = '\n';

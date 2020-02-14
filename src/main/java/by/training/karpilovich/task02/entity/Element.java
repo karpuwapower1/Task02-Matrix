@@ -3,11 +3,7 @@ package by.training.karpilovich.task02.entity;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public final class Element {
-	private static final Logger LOGGER = LogManager.getLogger(Element.class);
 
 	private int value;
 	private Lock lock = new ReentrantLock();
@@ -28,7 +24,6 @@ public final class Element {
 		if (lock.tryLock()) {
 			int value = Integer.parseInt(Thread.currentThread().getName());
 			this.value = value;
-			LOGGER.debug("element new value = " + value);
 			return true;
 		}
 		return false;

@@ -1,4 +1,4 @@
-package by.training.karpilovich.task02.service;
+package by.training.karpilovich.task02.entity.thread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,17 +13,17 @@ import org.apache.logging.log4j.Logger;
 import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
 
-public class MatrixChangerService implements Callable<Integer> {
+public class MatrixChangerThread implements Callable<Integer> {
 
 	private Matrix matrix = Matrix.getInstance();
-	List<Element> locked = new ArrayList<>();
+	private List<Element> locked = new ArrayList<>();
 	private int diagonalIndex = 0;
 	private CyclicBarrier barrier;
 	private int name;
 
-	private static final Logger LOGGER = LogManager.getLogger(MatrixChangerService.class);
+	private static final Logger LOGGER = LogManager.getLogger(MatrixChangerThread.class);
 
-	public MatrixChangerService(CyclicBarrier barrier, int name) {
+	public MatrixChangerThread(CyclicBarrier barrier, int name) {
 		this.barrier = barrier;
 		this.name = name;
 	}
@@ -35,11 +35,8 @@ public class MatrixChangerService implements Callable<Integer> {
 			Thread.currentThread().setName(String.valueOf(name));
 			changeDiagonalElement();
 			changeNonDiagonalElement();
-			LOGGER.debug("await barrier");
 			barrier.await();
-			LOGGER.debug("barrier is cancelled");
 			releaseElementLock();
-			LOGGER.debug("elements is released");
 			sum = countSum();
 		} catch (BrokenBarrierException | InterruptedException e) {
 			releaseElementLock();
@@ -51,23 +48,16 @@ public class MatrixChangerService implements Callable<Integer> {
 	private void changeDiagonalElement() {
 		while (!(isChanged(diagonalIndex, diagonalIndex))) {
 			diagonalIndex = (diagonalIndex == matrix.getLength() - 1) ? 0 : diagonalIndex + 1;
-			LOGGER.debug("index " + diagonalIndex);
 		}
-		LOGGER.debug("set diagonal index " + diagonalIndex);
 	}
 
 	private void changeNonDiagonalElement() {
 		Random random = new Random();
 		boolean change = false;
 		int index;
-		boolean isRow;
 		while (!change) {
 			if ((index = random.nextInt(matrix.getLength())) != diagonalIndex) {
-				change = (isRow = random.nextBoolean()) ? isChanged(diagonalIndex, index)
-						: isChanged(index, diagonalIndex);
-
-				LOGGER.debug("change = " + change + " isRow= " + isRow
-						+ (isRow ? (diagonalIndex + ", " + index) : (index + ", " + diagonalIndex)));
+				change = (random.nextBoolean()) ? isChanged(diagonalIndex, index) : isChanged(index, diagonalIndex);
 			}
 		}
 	}

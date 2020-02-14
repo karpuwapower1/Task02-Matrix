@@ -15,11 +15,11 @@ import org.apache.logging.log4j.Logger;
 import by.training.karpilovich.task02.dao.MatrixDAO;
 import by.training.karpilovich.task02.exception.DAOException;
 
-public class TXTFileMatrixDao implements MatrixDAO {
+public class FileMatrixDao implements MatrixDAO {
 
 	private File file;
 
-	private static final Logger LOGGER = LogManager.getLogger(TXTFileMatrixDao.class);
+	private static final Logger LOGGER = LogManager.getLogger(FileMatrixDao.class);
 
 	@Override
 	public void setResource(File file) {
@@ -45,7 +45,6 @@ public class TXTFileMatrixDao implements MatrixDAO {
 	@Override
 	public void write(String str) throws DAOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-			LOGGER.debug(str);
 			writer.write(str);
 			writer.flush();
 		} catch (IOException e) {

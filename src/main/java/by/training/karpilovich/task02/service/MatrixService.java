@@ -8,14 +8,14 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import by.training.karpilovich.task02.dao.MatrixDAO;
-import by.training.karpilovich.task02.dao.util.Formatter;
+import by.training.karpilovich.task02.dao.util.MatrixAndThreadFormat;
 import by.training.karpilovich.task02.entity.Matrix;
+import by.training.karpilovich.task02.entity.thread.MatrixChangerThread;
 import by.training.karpilovich.task02.exception.DAOException;
 import by.training.karpilovich.task02.exception.FormatException;
 import by.training.karpilovich.task02.exception.ServiceException;
@@ -23,11 +23,10 @@ import by.training.karpilovich.task02.factory.DAOFactory;
 
 public class MatrixService {
 	private static final Logger LOGGER = LogManager.getLogger(MatrixService.class);
-	Initializator initializator = new Initializator();
 	private Map<Integer, Future<Integer>> map = new HashMap<>();
 	private MatrixDAO writer = DAOFactory.getInstance().getMatrixDAO();
 	private static final String MATRIX_FILE = "change.txt";
-	private Formatter formatter = new Formatter();
+	private MatrixAndThreadFormat formatter = new MatrixAndThreadFormat();
 
 	public void changeMatrix(int[][] threadNames) throws ServiceException {
 		initWriter(MATRIX_FILE);
@@ -39,24 +38,20 @@ public class MatrixService {
 		}
 	}
 
-	private Map<Integer, Future<Integer>> changeMatrix(int[] name) throws ServiceException {
+	private Map<Integer, Future<Integer>> changeMatrix(int[] name) {
 		int threadQuantity = Matrix.getInstance().getLength();
 		CyclicBarrier barrier = new CyclicBarrier(Matrix.getInstance().getLength());
 		Future<Integer> future;
 		ExecutorService executor = Executors.newFixedThreadPool(threadQuantity);
 		for (int i = 0; i < Matrix.getInstance().getLength(); i++) {
-			future = executor.submit(new MatrixChangerService(barrier, name[i]));
+			future = executor.submit(new MatrixChangerThread(barrier, name[i]));
 			map.put(name[i], future);
 		}
 		executor.shutdown();
-
-		try {
-			executor.awaitTermination(1, TimeUnit.HOURS);
-			return map;
-		} catch (InterruptedException e) {
-			LOGGER.error("InterruptedException " + e);
-			throw new ServiceException();
+		while (!executor.isTerminated()) {
 		}
+		return map;
+
 	}
 
 	private void writeMatrix() throws ServiceException {
@@ -79,8 +74,6 @@ public class MatrixService {
 	private void initWriter(String fileName) throws ServiceException {
 		File file = initFile(fileName);
 		writer.setResource(file);
-
-		LOGGER.debug(file.getName());
 	}
 
 	private File initFile(String fileName) throws ServiceException {

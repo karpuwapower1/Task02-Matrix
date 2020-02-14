@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import by.training.karpilovich.task02.dao.MatrixDAO;
-import by.training.karpilovich.task02.dao.util.Formatter;
+import by.training.karpilovich.task02.dao.util.MatrixAndThreadFormat;
 import by.training.karpilovich.task02.entity.Element;
 import by.training.karpilovich.task02.entity.Matrix;
 import by.training.karpilovich.task02.exception.DAOException;
@@ -21,7 +21,7 @@ public class Initializator {
 
 	private final static Logger LOGGER = LogManager.getLogger(Initializator.class);
 
-	private Formatter format = new Formatter();
+	private MatrixAndThreadFormat format = new MatrixAndThreadFormat();
 	private static final String MATRIX_FILE = "matrix.txt";
 	private static final String THREAD_NAME_FILE = "threads.txt";
 	MatrixDAO reader = DAOFactory.getInstance().getMatrixDAO();
@@ -47,7 +47,6 @@ public class Initializator {
 		int capacity = 0;
 		for (int [] row : names) {
 			capacity += row.length;
-			LOGGER.debug("capacity= " + capacity);
 		}
 		if (!validator.isThreadQuantityLegal(capacity, Matrix.getInstance().getLength()) 
 				|| !validator.isThreadNamesUnique(names, capacity)) {
@@ -59,9 +58,10 @@ public class Initializator {
 	}
 
 	private int[][] readIntsFromFile(String fileName) throws ServiceException {
-		initReader(fileName);
 		int[] row;
-		String str = "";
+		String str = new String();
+		initReader(fileName);
+		
 		try {
 			List<String> list = reader.read();
 			int[][] elements = new int[list.size()][];
@@ -75,7 +75,7 @@ public class Initializator {
 			LOGGER.error("Illegel String: " + str + " file =" + fileName);
 			throw new ServiceException(e);
 		} catch (DAOException e) {
-			LOGGER.warn(e);
+			LOGGER.error(e);
 			throw new ServiceException(e);
 		}
 	}
